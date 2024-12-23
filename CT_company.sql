@@ -2,7 +2,7 @@ create table company(
     Company_id varchar(10),
     Company_name varchar(50),
     Description varchar(100),
-    company_size int,
+    company_size bigint,
     State varchar(50),
     Country varchar(50),
     City varchar(50),
@@ -26,9 +26,9 @@ create table company_speciality(
 
 create table employee_count(
     Company_id varchar(10),
-    Employee_count int,
-    Follower_count int,
-    time_recorded float,
+    Employee_count bigint,
+    Follower_count bigint,
+    time_recorded bigint,
     primary key(Company_id)
 );
 
