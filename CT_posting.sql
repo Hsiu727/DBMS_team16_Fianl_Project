@@ -18,25 +18,6 @@ create table job_posting(
     primary key (Job_id)
 );
 
-/*
-job_id,
-company_name,
-title,
-description,
-location,
-company_id,
-views,
-formatted_work_type,
-original_listed_time,
-job_posting_url,
-application_type,
-expiry,
-listed_time,
-posting_domain,
-sponsored,
-work_type
-*/
-
 LOAD DATA LOCAL INFILE 'archive/postings.csv'
 INTO TABLE job_posting
 CHARACTER SET latin1
