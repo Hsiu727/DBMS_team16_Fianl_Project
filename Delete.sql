@@ -17,4 +17,6 @@ drop table company;
 -- CT_posting.sql
 drop table job_posting;
 
-drop table users
+-- login_table.sql
+drop table users;
+drop table managers;
