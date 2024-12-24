@@ -1,6 +1,11 @@
-create table Users(
-    user_ID varchar(50),
-    user_name varchar(50),
-    user_password varchar(50),    
-    primary key (user_ID)
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(64) NOT NULL
+);
+
+CREATE TABLE managers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(64) NOT NULL
 );
