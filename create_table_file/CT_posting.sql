@@ -18,7 +18,7 @@ create table job_posting(
     primary key (Job_id)
 );
 
-LOAD DATA LOCAL INFILE 'archive/postings.csv'
+LOAD DATA LOCAL INFILE './archive/postings.csv'
 INTO TABLE job_posting
 CHARACTER SET latin1
 FIELDS TERMINATED BY ','
