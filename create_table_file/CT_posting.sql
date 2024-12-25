@@ -7,17 +7,11 @@ create table job_posting(
     Views int,
     Formatted_work_type varchar(50),
     Applies int,
-    Original_listed_time bigint,
     Job_posting_url varchar(255),
-    Application_type varchar(20),
-    Expiry bigint,
-    Listed_time bigint,
-    Sponsored int,
-    Work_type varchar(50),
     primary key (Job_id)
 );
 
-LOAD DATA LOCAL INFILE './archive/postings2.csv'
+LOAD DATA LOCAL INFILE './archive/postings.csv'
 INTO TABLE job_posting
 CHARACTER SET latin1
 FIELDS TERMINATED BY ';'

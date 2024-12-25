@@ -1,6 +1,5 @@
 create table benefits(
     Job_id varchar(255),
-    Inferred int,
     Job_type varchar(255)
 );
 
@@ -20,7 +19,6 @@ create table salary(
     Salary_id int,
     Job_id varchar(10),
     Max_salary DOUBLE,
-    Med_salary DOUBLE,
     Min_salary DOUBLE,
     Pay_period varchar(10),
     Currency varchar(10),
@@ -29,25 +27,25 @@ create table salary(
 
 LOAD DATA LOCAL INFILE './archive/jobs/benefits.csv'
 INTO TABLE benefits
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n' 
 IGNORE 1 LINES;
 
 LOAD DATA LOCAL INFILE './archive/jobs/job_industries.csv'
 INTO TABLE job_industry
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n' 
 IGNORE 1 LINES;
 
 
 LOAD DATA LOCAL INFILE './archive/jobs/job_skills.csv'
 INTO TABLE job_skill
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n' 
 IGNORE 1 LINES;
 
 LOAD DATA LOCAL INFILE './archive/jobs/salaries.csv'
 INTO TABLE salary
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n' 
 IGNORE 1 LINES;

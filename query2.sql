@@ -12,8 +12,6 @@ left join
 ) as new_table
 on jp.Job_id = new_table.Job_id;
 
-select * 
-from query2
-limit 100;
+select * from query2 limit 100;
 
 drop table query2;
