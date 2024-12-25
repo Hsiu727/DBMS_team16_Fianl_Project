@@ -205,6 +205,64 @@ def view_cart():
 
     return render_template("cart.html", cart_items=job_listings_in_cart)
 
+@app.route("/company")
+def company():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Get the current page number from the query string (default is 1)
+    page = request.args.get("page", 1, type=int)
+    per_page = 12  # Number of companies per page
+    offset = (page - 1) * per_page  # Calculate the offset for SQL query
+
+    # Fetch companies for the current page
+    cursor.execute("""
+    SELECT Company_name, State, Country, City, Address, URL 
+    FROM company 
+    LIMIT %s OFFSET %s
+    """, (per_page, offset))
+    companies = cursor.fetchall()
+
+    # Fetch the total number of companies to calculate total pages
+    cursor.execute("SELECT COUNT(*) FROM company")
+    total_companies = cursor.fetchone()[0]
+    total_pages = (total_companies + per_page - 1) // per_page  # Calculate total pages
+
+    cursor.close()
+    conn.close()
+
+    # Define the range of page numbers to display (only 4 at a time)
+    max_visible_pages = 4
+    start_page = max(1, page - max_visible_pages // 2)
+    end_page = min(total_pages, start_page + max_visible_pages - 1)
+
+    if end_page - start_page + 1 < max_visible_pages:
+        start_page = max(1, end_page - max_visible_pages + 1)
+
+    page_range = range(start_page, end_page + 1)
+
+    # Create a list of companies to pass to the template
+    company_list = [
+        {
+            "Name": row[0],
+            "State": row[1],
+            "Countery": row[2],
+            "City": row[3],
+            "Address": row[4],
+            "URL": row[5]
+        }
+        for row in companies
+    ]
+
+    return render_template(
+        "company_page.html",
+        jobs=company_list,
+        page=page,
+        total_pages=total_pages,
+        page_range=page_range
+    )
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
