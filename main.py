@@ -38,9 +38,15 @@ def login():
             cursor.execute("SELECT password FROM managers WHERE username = %s", (username,))
             result = cursor.fetchone()
 
+        
+        cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+        session['user_id'] = cursor.fetchone()
+
         cursor.close()
         conn.close()
             
+        
+
         if result==None:
             flash("Invalid username or password", "error")
             return render_template("login2.html")
@@ -100,23 +106,113 @@ def signup():
     
     return render_template("signup.html")
 
-job_listings = [
-    {"title": "professor ", "company": "TechCorp", "location": "New York, NY", "salary": "$100k - $120k"},
-    {"title": "Marketing Specialist", "company": "MarketPlus", "location": "San Francisco, CA", "salary": "$60k - $80k"},
-    {"title": "Data Scientist", "company": "DataInsights", "location": "Remote", "salary": "$90k - $110k"},
-    {"title": "Graphic Designer", "company": "CreativeHub", "location": "Austin, TX", "salary": "$50k - $70k"},
-    {"title": "student", "company": "pung", "location": "nycu", "salary": "-30k~0k"},
-]
+# job_listings = [
+#     {"title": "professor ", "company": "TechCorp", "location": "New York, NY", "salary": "$100k - $120k"},
+#     {"title": "Marketing Specialist", "company": "MarketPlus", "location": "San Francisco, CA", "salary": "$60k - $80k"},
+#     {"title": "Data Scientist", "company": "DataInsights", "location": "Remote", "salary": "$90k - $110k"},
+#     {"title": "Graphic Designer", "company": "CreativeHub", "location": "Austin, TX", "salary": "$50k - $70k"},
+#     {"title": "student", "company": "pung", "location": "nycu", "salary": "-30k~0k"},
+# ]
+
+
 
 @app.route("/main_page2")
 def home():
+    search_query = request.args.get('search_query')  # Get the search query from the URL
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if search_query:  # If there's a search query, filter the jobs based on it
+        query = """
+        SELECT * FROM query1
+        WHERE title LIKE %s OR company LIKE %s OR location LIKE %s
+        LIMIT 21
+        """
+        search_term = f"%{search_query}%"
+        cursor.execute(query, (search_term, search_term, search_term))
+    else:
+        # If no search query, get all jobs (or you can decide how to handle this)
+        cursor.execute("SELECT * FROM query1 LIMIT 21")
+    
+    results = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    # Convert the results to a list of dictionaries
+    job_listings = [{"title": row[0], "company": row[2], "location": row[1], "salary": f"{int(row[3])}~{int(row[4])}", "id":row[5]} for row in results]
+
     return render_template("main_page2.html", jobs=job_listings)
 
-@app.route("/search", methods=["POST"])
-def search():
-    query = request.form.get("query", "").lower()
-    filtered_jobs = [job for job in job_listings if query in job["title"].lower() or query in job["company"].lower()]
-    return render_template("main_page2.html", jobs=filtered_jobs)
+# Add job to shopping cart
+@app.route("/add_to_cart/<int:job_id>", methods=["POST"])
+def add_to_cart(job_id):
+    if 'username' not in session:
+        flash("Please log in to add jobs to your cart.", "error")
+        return redirect("/")
+    
+    # Get the user ID from the session (this assumes you store user_id after login)
+    user_id = session.get('user_id')
+
+
+    # Connect to the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Insert the job into the shopping cart table
+        cursor.execute("INSERT INTO shopping_car (user_id, Job_id) VALUES (%s, %s)", (user_id, job_id))
+        conn.commit()
+        flash("Job added to your shopping cart!", "success")
+    except mysql.connector.Error as err:
+        flash(f"Error: {err}", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect("/main_page2")
+
+# View shopping cart
+@app.route("/view_cart")
+def view_cart():
+    # Check if the user is logged in
+    if 'username' not in session:
+        return redirect("/")  # Redirect to login page if not logged in
+
+    # Get user_id from session or database
+    username = session['username']
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch user_id from the users table
+    cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+    user_id = cursor.fetchone()[0]
+
+    # Get jobs added to the shopping cart for the user
+    cursor.execute("""
+    SELECT j.Job_id, j.Title, j.company, j.location, j.Min_salary, j.Max_salary 
+    FROM shopping_car sc
+    JOIN query1 j ON sc.job_id = j.Job_id
+    WHERE sc.user_id = %s
+    """, (user_id,))
+    
+    cart_items = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    # Convert the results to a list of dictionaries
+    job_listings_in_cart = [
+        {
+            "id": row[0],
+            "title": row[1],
+            "company": row[2],
+            "location": row[3],
+            "salary": f"{int(row[4])}~{int(row[5])}"
+        }
+        for row in cart_items
+    ]
+
+    return render_template("cart.html", jobs=job_listings_in_cart)
 
 
 if __name__ == "__main__":

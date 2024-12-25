@@ -2,7 +2,6 @@ create table job_posting(
     Job_id varchar(10),
     Company_name varchar(50),
     Title varchar(255),
-    Posting_description varchar(255),
     Posting_location varchar(255),
     Company_id varchar(10),
     Views int,
@@ -18,9 +17,9 @@ create table job_posting(
     primary key (Job_id)
 );
 
-LOAD DATA LOCAL INFILE './archive/postings.csv'
+LOAD DATA LOCAL INFILE './archive/postings2.csv'
 INTO TABLE job_posting
 CHARACTER SET latin1
-FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\r\n' 
 IGNORE 1 LINES;

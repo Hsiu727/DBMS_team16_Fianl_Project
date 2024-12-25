@@ -54,26 +54,40 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .search-bar {
-            display: flex;
-            justify-content: center;
+            display: flex;  /* Flexbox ensures the input and button are next to each other */
+            justify-content: center;  /* Centers them horizontally */
             margin-bottom: 2rem;
+            width: 100%;  /* Ensure the search bar takes up the full width */
         }
+
         .search-bar input[type="text"] {
-            width: 70%;
-            padding: 0.5rem;
-            font-size: 1rem;
+            width: 70%;  /* Adjust width as needed */
+            padding: 0.8rem;  /* Increase padding for better spacing */
+            font-size: 1.2rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
+
         .search-bar button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
+            padding: 0.8rem 1.2rem;
+            font-size: 1.2rem;
             background: #007acc;
             color: white;
-            border: none;
+            border: 1px solid #007acc;
             cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10rem;  /* Adds space between input and button */
+
+            position: relative;
+            top: -50px;
+            left: 240px;
         }
+
         .search-bar button:hover {
             background: #005f99;
         }
+
+
         .job-listings {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -110,7 +124,7 @@
         <a href="#">Home</a>
         <a href="#">Jobs</a>
         <a href="#">Companies</a>
-        <a href="#">Profile</a>
+        <a href="{{url_for('view_cart')}}">car</a>
     </nav>
     <div class="hero">
         <h1>Find Your Dream Job Today</h1>
@@ -118,9 +132,11 @@
     </div>
     <div class="container">
         <div class="search-bar">
-            <input type="text" placeholder="Search for jobs, skills, or companies...">
-            <button>Search</button>
-        </div>
+            <form method="GET" action="{{ url_for('home') }}">
+                <input type="text" name="search_query" placeholder="Search for jobs, skills, or companies...">
+                <button type="submit">Search</button>
+            </form>
+        </div>        
         <h2>Featured Job Listings</h2>
         <div class="job-listings">
             <!-- Loop through jobs using Jinja2 -->
@@ -130,6 +146,11 @@
                 <p>Company: {{ job.company }}</p>
                 <p>Location: {{ job.location }}</p>
                 <p>Salary: {{ job.salary }}</p>
+
+                <!-- Add to Cart Button -->
+                <form method="POST" action="{{ url_for('add_to_cart', job_id=job.id) }}">
+                    <button type="submit">Add to Cart</button>
+                </form>
             </div>
             {% endfor %}
         </div>

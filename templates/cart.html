@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .cart-item {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        .cart-item h3 {
+            margin: 0;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem 0;
+            background: #005f99;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Shopping Cart</h1>
+    </header>
+    <div class="container">
+        {% if cart_items %}
+        <ul>
+            {% for job in cart_items %}
+            <li class="cart-item">
+                <h3>{{ job.title }}</h3>
+                <p>Company: {{ job.company }}</p>
+                <p>Location: {{ job.location }}</p>
+                <p>Salary: {{ job.salary }}</p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+    <footer>
+        <p>&copy; 2024 Job Finder. All rights reserved.</p>
+    </footer>
+</body>
+</html>
