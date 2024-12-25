@@ -31,21 +31,15 @@ def login():
         cursor = conn.cursor()
         
         if role == 'user':
-            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT password,id FROM users WHERE username = %s", (username,))
             result = cursor.fetchone()
 
         elif role == 'manager':
-            cursor.execute("SELECT password FROM managers WHERE username = %s", (username,))
+            cursor.execute("SELECT password,id FROM managers WHERE username = %s", (username,))
             result = cursor.fetchone()
-
-        
-        cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
-        session['user_id'] = cursor.fetchone()
 
         cursor.close()
         conn.close()
-            
-        
 
         if result==None:
             flash("Invalid username or password", "error")
@@ -53,6 +47,7 @@ def login():
         elif result[0] == hashed_password:
             # if pass the check, redirect to the welcome page and store the username in the session
             session['username'] = username
+            session['user_id'] = result[1]
             return redirect("/main_page2") # commit this line after completing TODO # 2
         else:
             flash("Invalid username or password", "error")
@@ -180,19 +175,15 @@ def view_cart():
         return redirect("/")  # Redirect to login page if not logged in
 
     # Get user_id from session or database
-    username = session['username']
+    user_id = session['user_id']
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    # Fetch user_id from the users table
-    cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
-    user_id = cursor.fetchone()[0]
 
     # Get jobs added to the shopping cart for the user
     cursor.execute("""
     SELECT j.Job_id, j.Title, j.company, j.location, j.Min_salary, j.Max_salary 
     FROM shopping_car sc
-    JOIN query1 j ON sc.job_id = j.Job_id
+    JOIN query1 j ON sc.Job_id = j.Job_id
     WHERE sc.user_id = %s
     """, (user_id,))
     
@@ -212,7 +203,7 @@ def view_cart():
         for row in cart_items
     ]
 
-    return render_template("cart.html", jobs=job_listings_in_cart)
+    return render_template("cart.html", cart_items=job_listings_in_cart)
 
 
 if __name__ == "__main__":

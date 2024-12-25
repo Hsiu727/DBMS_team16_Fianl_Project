@@ -5,57 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Shopping Cart</title>
     <style>
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background: linear-gradient(to bottom, #00b4db, #0083b0);
             color: #333;
         }
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 1rem;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        h1, h3, p {
+            margin: 0;
         }
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            background: url('https://images.unsplash.com/photo-1529400971008-f566de0e6dfc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080') no-repeat center/cover;
+            color: white;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Cart Item Styles */
         .cart-item {
             padding: 1rem;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
         }
         .cart-item h3 {
-            margin: 0;
+            color: #005f99;
         }
+        .cart-item p {
+            color: #555;
+        }
+
+        /* Empty Cart Message */
+        .empty-cart {
+            text-align: center;
+            color: #888;
+            font-size: 1.2rem;
+            padding: 2rem;
+        }
+
+        /* Footer Styles */
         footer {
             text-align: center;
-            padding: 1rem 0;
+            padding: 1rem;
             background: #005f99;
             color: white;
+            margin-top: 2rem;
+        }
+        footer p {
+            margin: 0;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            margin: 1rem 0;
+            background: #005f99;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #003f6b;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #005f99;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .back-to-top:hover {
+            background: #003f6b;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Your Shopping Cart</h1>
+        <p>Find your dream job, one click away!</p>
     </header>
     <div class="container">
         {% if cart_items %}
         <ul>
             {% for job in cart_items %}
             <li class="cart-item">
-                <h3>{{ job.title }}</h3>
-                <p>Company: {{ job.company }}</p>
-                <p>Location: {{ job.location }}</p>
-                <p>Salary: {{ job.salary }}</p>
+                <div>
+                    <h3>{{ job.title }}</h3>
+                    <p>Company: {{ job.company }}</p>
+                    <p>Location: {{ job.location }}</p>
+                    <p>Salary: {{ job.salary }}</p>
+                </div>
+                <a href="/remove_from_cart/{{ job.id }}" class="btn">Remove</a>
             </li>
             {% endfor %}
         </ul>
         {% else %}
-        <p>Your cart is empty.</p>
+        <p class="empty-cart">Your cart is empty. Start adding your favorite jobs!</p>
+        <a href="/main_page2" class="btn">Browse Jobs</a>
         {% endif %}
     </div>
     <footer>
         <p>&copy; 2024 Job Finder. All rights reserved.</p>
     </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" onclick="scrollToTop()">⬆ Back to Top</button>
+
+    <script>
+        // Smooth scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Hide Back to Top button when not scrolling
+        const backToTopButton = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        // Initially hide button
+        backToTopButton.style.display = 'none';
+    </script>
 </body>
 </html>
