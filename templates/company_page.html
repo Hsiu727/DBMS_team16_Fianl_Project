@@ -56,6 +56,40 @@
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
         }
 
+        .search-bar {
+            display: flex;  /* Flexbox ensures the input and button are next to each other */
+            justify-content: center;  /* Centers them horizontally */
+            margin-bottom: 2rem;
+            width: 100%;  /* Ensure the search bar takes up the full width */
+        }
+
+        .search-bar input[type="text"] {
+            width: 70%;  /* Adjust width as needed */
+            padding: 0.8rem;  /* Increase padding for better spacing */
+            font-size: 1.2rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-bar button {
+            padding: 0.8rem 1.2rem;
+            font-size: 1.2rem;
+            background: #007acc;
+            color: white;
+            border: 1px solid #007acc;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-left: 10rem;  /* Adds space between input and button */
+
+            position: relative;
+            top: -50px;
+            left: 240px;
+        }
+
+        .search-bar button:hover {
+            background: #005f99;
+        }
+
         .job-listings {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -116,6 +150,12 @@
         <a href="{{url_for('view_cart')}}">Shopping cart</a>
     </nav>
     <div class="container">
+        <div class="search-bar">
+            <form method="GET" action="{{ url_for('company') }}">
+                <input type="text" name="search_query" placeholder="Search for companies">
+                <button type="submit">Search</button>
+            </form>
+        </div>
         <h2>Companies and Information Listings</h2>
         <div class="job-listings">
             {% for job in jobs %}
