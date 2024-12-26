@@ -4,6 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: #007BFF;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 20px;
+        }
+
+        /* 表单容器 */
+        form {
+            background-color: #fff;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表单标签和输入框样式 */
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* 提交按钮样式 */
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -15,38 +92,32 @@
     </nav>
     <h1>{{ page_title }}</h1>
 
+    <!-- 第一步：輸入查詢條件 -->
+    <form method="GET">
+        <label for="search">Enter Title or ID to Update:</label>
+        <input type="text" id="search" name="search" required>
+        <button type="submit">Search</button>
+    </form>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Industry Name</th>
-                <th>Type of Insurance</th>
-                <th>Skill Abbreviation</th>
-                <th>Skill Name</th>
-                <th>Max Salary</th>
-                <th>Median Salary</th>
-                <th>Min Salary</th>
-                <th>Pay Period</th>
-                <th>Currency</th>
-                <th>Compensation</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in data %}
-            <tr>
-                <td>{{ entry.industry_name }}</td>
-                <td>{{ entry.insurance_type }}</td>
-                <td>{{ entry.skill_abbreviation }}</td>
-                <td>{{ entry.skill_name }}</td>
-                <td>{{ entry.max_salary }}</td>
-                <td>{{ entry.median_salary }}</td>
-                <td>{{ entry.min_salary }}</td>
-                <td>{{ entry.pay_period }}</td>
-                <td>{{ entry.currency }}</td>
-                <td>{{ entry.compensation }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- 第二步：更新選項（僅在有查詢結果時顯示） -->
+    {% if data %}
+    <form method="POST">
+        <h3>Update Record for: {{ data.title or data.id }}</h3>
+
+        <label for="field">Select Field to Update:</label>
+        <select id="field" name="field" required>
+            <option value="title">Title</option>
+            <option value="posting_location">Location</option>
+            <option value="company_name">Company Name</option>
+            <option value="max_salary">Max Salary</option>
+            <option value="min_salary">Min Salary</option>
+        </select>
+
+        <label for="new_value">Enter New Value:</label>
+        <input type="text" id="new_value" name="new_value" required>
+
+        <button type="submit">Update</button>
+    </form>
+    {% endif %}
 </body>
 </html>
