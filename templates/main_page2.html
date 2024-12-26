@@ -17,13 +17,20 @@
             color: white;
             padding: 1rem 0;
             text-align: center;
+
         }
         nav {
             display: flex;
             justify-content: center;
             background: #005f99;
             padding: 0.5rem 0;
+            position: sticky;  /* Fixed position at the top */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Ensure it spans the full width */
+            z-index: 1000;  /* Ensure it's on top of other content */
         }
+
         nav a {
             color: white;
             text-decoration: none;
@@ -87,7 +94,6 @@
             background: #005f99;
         }
 
-
         .job-listings {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -107,12 +113,105 @@
             margin: 0.5rem 0;
             color: #555;
         }
+
+        .job-card button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            background-color: #007acc;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            text-decoration: none;  /* Remove any default underline or decoration */
+        }
+
+        .job-card button:hover {
+            background-color: #005f99;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .job-card button:focus {
+            outline: none;
+        }
+
+        /* Optional: Adding a little space between the icon and the button text */
+        .job-card button span {
+            margin-left: 8px;
+        }
+
+
+        /* Shopping Cart Positioning */
+        .shopping-cart {
+            position: fixed;
+            top: 40px;
+            right: 20px;
+            background-color: #007acc;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .shopping-cart:hover {
+            background-color: #005f99;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #000;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .back-to-top:hover {
+            background: #003f6b;
+        }
         footer {
             text-align: center;
             padding: 1rem 0;
             background: #005f99;
             color: white;
         }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style-type: none;
+            padding: 1rem 0;
+        }
+        .pagination a {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #007acc;
+            border: 1px solid #007acc;
+            margin: 0 0.5rem;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #005f99;
+            color: white;
+        }
+        .pagination .active {
+            background-color: #007acc;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -122,9 +221,7 @@
     </header>
     <nav>
         <a href="{{url_for('home')}}">Home</a>
-        <a href="#">Jobs</a>
         <a href="{{url_for('company')}}">Companies</a>
-        <a href="{{url_for('view_cart')}}">Shopping cart</a>
     </nav>
     <div class="hero">
         <h1>Find Your Dream Job Today</h1>
@@ -145,16 +242,62 @@
                 <h3>{{ job.title }}</h3>
                 <p>Company: {{ job.company }}</p>
                 <p>Location: {{ job.location }}</p>
+                <p>Skill: {{ job.skill }}</p>
                 <p>Salary: {{ job.salary }}</p>
 
                 <!-- Add to Cart Button -->
                 <form method="POST" action="{{ url_for('add_to_cart', job_id=job.id) }}">
-                    <button type="submit">Add to Cart</button>
+                    <button type="submit">🛒 Add to Cart</button>
                 </form>
             </div>
             {% endfor %}
         </div>
     </div>
+    <!-- Pagination Controls -->
+    <div class="pagination">
+        {% if page > 1 %}
+            <a href="{{ url_for('home', page=page-1, search_query=search_query) }}">Previous</a>
+        {% endif %}
+
+        {% for p in page_range %}
+            <a href="{{ url_for('home', page=p, search_query=search_query) }}" class="{% if p == page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('home', page=page+1, search_query=search_query) }}">Next</a>
+        {% endif %}
+    </div>
+
+    <!-- Shopping Cart Button -->
+    <div class="shopping-cart">
+        <a href="{{ url_for('view_cart') }}" style="color: white; text-decoration: none;">🛒 Cart</a>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" onclick="scrollToTop()">⬆ Back to Top</button>
+
+    <script>
+        // Smooth scroll to top
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Hide Back to Top button when not scrolling
+        const backToTopButton = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+
+        // Initially hide button
+        backToTopButton.style.display = 'none';
+    </script>
     <footer>
         <p>&copy; 2024 Job Finder. All rights reserved.</p>
     </footer>

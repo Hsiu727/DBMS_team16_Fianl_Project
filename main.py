@@ -10,7 +10,7 @@ app.secret_key = "your_secret_key"
 db_config = {
     'host': 'localhost',  # Change this to your MySQL host
     'user': 'root',  # Change this to your MySQL username
-    'password': '1234',  # Change this to your MySQL password
+    'password': '',  # Change this to your MySQL password
     'database': 'final_project'  # Change this to your MySQL database name
 }
 
@@ -97,20 +97,13 @@ def signup():
     
     return render_template("signup.html")
 
-# job_listings = [
-#     {"title": "professor ", "company": "TechCorp", "location": "New York, NY", "salary": "$100k - $120k"},
-#     {"title": "Marketing Specialist", "company": "MarketPlus", "location": "San Francisco, CA", "salary": "$60k - $80k"},
-#     {"title": "Data Scientist", "company": "DataInsights", "location": "Remote", "salary": "$90k - $110k"},
-#     {"title": "Graphic Designer", "company": "CreativeHub", "location": "Austin, TX", "salary": "$50k - $70k"},
-#     {"title": "student", "company": "pung", "location": "nycu", "salary": "-30k~0k"},
-# ]
-
-
-
 @app.route("/main_page2")
 def home():
     search_query = request.args.get('search_query')  # Get the search query from the URL
-    
+    page = request.args.get("page", 1, type=int)  # Get the current page number from the URL (default is 1)
+    per_page = 21  # Number of jobs to show per page
+    offset = (page - 1) * per_page  # Calculate the offset for the SQL query
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -118,22 +111,54 @@ def home():
         query = """
         SELECT * FROM query1
         WHERE title LIKE %s OR company LIKE %s OR location LIKE %s
-        LIMIT 21
+        LIMIT %s OFFSET %s
         """
         search_term = f"%{search_query}%"
-        cursor.execute(query, (search_term, search_term, search_term))
+        cursor.execute(query, (search_term, search_term, search_term, per_page, offset))
     else:
-        # If no search query, get all jobs (or you can decide how to handle this)
-        cursor.execute("SELECT * FROM query1 LIMIT 21")
+        # If no search query, get all jobs
+        cursor.execute("SELECT * FROM query1 LIMIT %s OFFSET %s", (per_page, offset))
     
     results = cursor.fetchall()
+
+    # Fetch the total number of jobs to calculate total pages
+    if search_query:
+        cursor.execute("""
+        SELECT COUNT(*) 
+        FROM query1
+        WHERE title LIKE %s OR company LIKE %s OR location LIKE %s
+        """, (search_term, search_term, search_term))
+    else:
+        cursor.execute("SELECT COUNT(*) FROM query1")
+        
+    total_jobs = cursor.fetchone()[0]
+    total_pages = (total_jobs + per_page - 1) // per_page  # Calculate the total number of pages
+
     cursor.close()
     conn.close()
 
     # Convert the results to a list of dictionaries
-    job_listings = [{"title": row[0], "company": row[2], "location": row[1], "salary": f"{int(row[3])}~{int(row[4])}", "id":row[5]} for row in results]
+    job_listings = [{"title": row[0], "company": row[2], "location": row[1], "skill": row[6], "salary": f"{int(row[3])}~{int(row[4])} {row[7]}", "id":row[5]} for row in results]
 
-    return render_template("main_page2.html", jobs=job_listings)
+    # Define the range of page numbers to display (only 4 at a time)
+    max_visible_pages = 4
+    start_page = max(1, page - max_visible_pages // 2)
+    end_page = min(total_pages, start_page + max_visible_pages - 1)
+
+    if end_page - start_page + 1 < max_visible_pages:
+        start_page = max(1, end_page - max_visible_pages + 1)
+
+    page_range = range(start_page, end_page + 1)
+
+    return render_template(
+        "main_page2.html",
+        jobs=job_listings,
+        page=page,
+        total_pages=total_pages,
+        page_range=page_range,
+        search_query=search_query  # Pass the search query back to the template
+    )
+
 
 # Add job to shopping cart
 @app.route("/add_to_cart/<int:job_id>", methods=["POST"])
@@ -162,6 +187,7 @@ def add_to_cart(job_id):
         conn.close()
 
     return redirect("/main_page2")
+
 
 # Remove job from shopping cart
 @app.route("/remove_from_cart/<int:job_id>", methods=["POST"])
@@ -206,7 +232,7 @@ def view_cart():
 
     # Get jobs added to the shopping cart for the user
     cursor.execute("""
-    SELECT j.Job_id, j.Title, j.company, j.location, j.Min_salary, j.Max_salary 
+    SELECT j.Job_id, j.Title, j.company, j.location, j.Min_salary, j.Max_salary , j.Skill_name , j.Currency
     FROM shopping_car sc
     JOIN query1 j ON sc.Job_id = j.Job_id
     WHERE sc.user_id = %s
@@ -223,7 +249,8 @@ def view_cart():
             "title": row[1],
             "company": row[2],
             "location": row[3],
-            "salary": f"{int(row[4])}~{int(row[5])}"
+            "skill": row[6],
+            "salary": f"{int(row[4])}~{int(row[5])} {row[7]}"
         }
         for row in cart_items
     ]
@@ -231,25 +258,45 @@ def view_cart():
     return render_template("cart.html", cart_items=job_listings_in_cart)
 
 @app.route("/company")
+@app.route("/company")
 def company():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
     # Get the current page number from the query string (default is 1)
     page = request.args.get("page", 1, type=int)
+    search_query = request.args.get('search_query', '')  # Get search query from the URL
     per_page = 12  # Number of companies per page
     offset = (page - 1) * per_page  # Calculate the offset for SQL query
 
-    # Fetch companies for the current page
-    cursor.execute("""
-    SELECT Company_name, State, Country, City, Address, URL 
-    FROM company 
-    LIMIT %s OFFSET %s
-    """, (per_page, offset))
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # If there's a search query, filter companies based on the search query
+    if search_query:
+        cursor.execute("""
+            SELECT Company_name, State, Country, City, Address, URL 
+            FROM company 
+            WHERE Company_name LIKE %s OR City LIKE %s OR State LIKE %s OR Country LIKE %s
+            LIMIT %s OFFSET %s
+        """, (f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', per_page, offset))
+    else:
+        # If no search query, get all companies
+        cursor.execute("""
+            SELECT Company_name, State, Country, City, Address, URL 
+            FROM company 
+            LIMIT %s OFFSET %s
+        """, (per_page, offset))
+
     companies = cursor.fetchall()
 
     # Fetch the total number of companies to calculate total pages
-    cursor.execute("SELECT COUNT(*) FROM company")
+    if search_query:
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM company 
+            WHERE Company_name LIKE %s OR City LIKE %s OR State LIKE %s OR Country LIKE %s
+        """, (f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', f'%{search_query}%'))
+    else:
+        cursor.execute("SELECT COUNT(*) FROM company")
+        
     total_companies = cursor.fetchone()[0]
     total_pages = (total_companies + per_page - 1) // per_page  # Calculate total pages
 
@@ -271,7 +318,7 @@ def company():
         {
             "Name": row[0],
             "State": row[1],
-            "Countery": row[2],
+            "Country": row[2],
             "City": row[3],
             "Address": row[4],
             "URL": row[5]
@@ -284,8 +331,10 @@ def company():
         jobs=company_list,
         page=page,
         total_pages=total_pages,
-        page_range=page_range
+        page_range=page_range,
+        search_query=search_query  # Pass search query back to the template
     )
+
 
 # management page 
 @app.route("/management_page")
