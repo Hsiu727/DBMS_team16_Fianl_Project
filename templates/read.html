@@ -4,16 +4,128 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
+    <style>
+        /* 通用样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: #007BFF;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 20px;
+        }
+
+        /* 搜索栏样式 */
+        .search-bar {
+            max-width: 600px;
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* 最近记录标题 */
+        .recent-title {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 20px;
+            color: #007BFF;
+        }
+    </style>
 </head>
 <body>
     <nav>
-        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('home2') }}">Home</a>
         <a href="{{ url_for('create') }}">Create</a>
         <a href="{{ url_for('read') }}">Read</a>
+        <a href="{{ url_for('update') }}">Update</a>
+        <a href="{{ url_for('delete') }}">Delete</a>        
     </nav>
     <h1>{{ page_title }}</h1>
 
-    <table border="1" cellpadding="5" cellspacing="0">
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+        <form method="GET" action="{{ url_for('read') }}">
+            <input type="text" name="search" placeholder="Search by Title, Company Name, or Salary">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- 数据表 -->
+    <h2 class="recent-title">Search data</h2>
+    <table>
         <thead>
             <tr>
                 <th>Title</th>
@@ -25,6 +137,31 @@
         </thead>
         <tbody>
             {% for row in data %}
+            <tr>
+                <td>{{ row[0] }}</td> <!-- Title -->
+                <td>{{ row[1] }}</td> <!-- Posting Location -->
+                <td>{{ row[2] }}</td> <!-- Company Name -->
+                <td>{{ row[3] }}</td> <!-- Max Salary -->
+                <td>{{ row[4] }}</td> <!-- Min Salary -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 最近 5 条记录 -->
+    <h2 class="recent-title">Latest 5 Entries</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Posting Location</th>
+                <th>Company Name</th>
+                <th>Max Salary</th>
+                <th>Min Salary</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in latest_data %}
             <tr>
                 <td>{{ row[0] }}</td> <!-- Title -->
                 <td>{{ row[1] }}</td> <!-- Posting Location -->

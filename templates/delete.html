@@ -4,6 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: #007BFF;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 20px;
+        }
+
+        /* 搜索表单样式 */
+        .search-form {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-form button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 表格样式 */
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ccc;
+        }
+
+        table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        /* 删除按钮样式 */
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
 </head>
 <body>
     <nav>
@@ -15,35 +119,38 @@
     </nav>
     <h1>{{ page_title }}</h1>
 
+    <!-- 搜索框 -->
+    <form class="search-form" method="GET" action="{{ url_for('delete') }}">
+        <input type="text" name="search_query" placeholder="Search by Title or Company" required>
+        <button type="submit">Search</button>
+    </form>
 
-    <table border="1">
+    <!-- 搜索结果表格 -->
+    <table>
         <thead>
             <tr>
-                <th>Industry Name</th>
-                <th>Type of Insurance</th>
-                <th>Skill Abbreviation</th>
-                <th>Skill Name</th>
+                <th>Title</th>
+                <th>Company</th>
+                <th>Location</th>
                 <th>Max Salary</th>
-                <th>Median Salary</th>
                 <th>Min Salary</th>
-                <th>Pay Period</th>
-                <th>Currency</th>
-                <th>Compensation</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
             {% for entry in data %}
             <tr>
-                <td>{{ entry.industry_name }}</td>
-                <td>{{ entry.insurance_type }}</td>
-                <td>{{ entry.skill_abbreviation }}</td>
-                <td>{{ entry.skill_name }}</td>
-                <td>{{ entry.max_salary }}</td>
-                <td>{{ entry.median_salary }}</td>
-                <td>{{ entry.min_salary }}</td>
-                <td>{{ entry.pay_period }}</td>
-                <td>{{ entry.currency }}</td>
-                <td>{{ entry.compensation }}</td>
+                <td>{{ entry.Title }}</td>
+                <td>{{ entry.company }}</td>
+                <td>{{ entry.location }}</td>
+                <td>{{ entry.Max_salary }}</td>
+                <td>{{ entry.Min_salary }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('delete') }}">
+                        <input type="hidden" name="job_id" value="{{ entry.Job_id }}">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
