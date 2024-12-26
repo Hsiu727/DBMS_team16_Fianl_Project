@@ -20,3 +20,12 @@ drop table job_posting;
 -- login_table.sql
 drop table users;
 drop table managers;
+
+-- queries
+drop table query1;
+drop table query2;
+
+-- shopping cart
+drop table shopping_car;
+
+drop database final_project;

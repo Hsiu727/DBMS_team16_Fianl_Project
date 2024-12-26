@@ -1,7 +1,7 @@
+-- Query 1
 CREATE TABLE query1 AS
 SELECT  
-    p.Title, 
-    p.Posting_location AS location, 
+    p.Title, p.Posting_location AS location, 
     p.Company_name AS company, 
     s.Max_salary, 
     s.Min_salary,
@@ -27,12 +27,24 @@ GROUP BY
     s.Currency
 Order by p.Views;
 
-/*
-SELECT Title
-FROM query1
-GROUP BY Title, location, company, Max_salary, Min_salary
-HAVING COUNT(*) > 1;
-*/
+
+-- Query2
+create table query2 as 
+select 
+    jp.Title as Title,
+    jp.Company_name as Company
+from job_posting jp
+left join
+(
+    select Job_id 
+    from job_skill js
+    left join skills s on s.Skill_addr=js.Skill_addr
+    where s.Skill_name = 'Education'
+) as new_table
+on jp.Job_id = new_table.Job_id;
+
+
+-- 
 
 
 

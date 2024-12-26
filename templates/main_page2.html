@@ -40,6 +40,7 @@
         nav a:hover {
             text-decoration: underline;
         }
+
         .hero {
             text-align: center;
             padding: 2rem;
@@ -92,6 +93,43 @@
 
         .search-bar button:hover {
             background: #005f99;
+        }
+
+        .flash-messages {
+            margin: 1rem auto; /* Smaller margin for compact placement */
+            padding: 0.8rem 0.5rem; /* Reduced padding for a smaller green area */
+            background-color: #155192;
+            color: white; /* Improved contrast */
+            border: 1px solid #155192;
+            border-radius: 5px;
+            font-size: 1.5rem; /* Larger text for better visibility */
+            width: 75%; /* Keeps it responsive */
+            max-width: 500px; /* Limits the width for a smaller appearance */
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            border-radius: 5px;
+            text-align: center; /* Centers the text */
+            display: flex; /* Enables flexbox */
+            position: relative;
+            top: -75px;
+            left: -14px;
+            align-items: flex-start; /* Moves text slightly downward */
+            justify-content: center; /* Centers text horizontally */
+            height: 48px; /* Ensures consistent height for the box */
+        }
+
+        .flash-messages ul {
+            padding: 0; /* Removes extra padding from list */
+            margin: 0;
+            list-style: none; /* Removes default bullet points */
+        }
+
+        .flash-messages li {
+            margin-bottom: 1rem; /* Adds spacing between multiple messages */
+            line-height: 1; /* Better line height for readability */
+        }
+
+        .flash-messages .success {
+            background-color: #155192;
         }
 
         .job-listings {
@@ -233,7 +271,16 @@
                 <input type="text" name="search_query" placeholder="Search for jobs, skills, or companies...">
                 <button type="submit">Search</button>
             </form>
-        </div>        
+        </div>   
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
         <h2>Featured Job Listings</h2>
         <div class="job-listings">
             <!-- Loop through jobs using Jinja2 -->

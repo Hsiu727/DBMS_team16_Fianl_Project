@@ -48,6 +48,7 @@ def login():
             # if pass the check, redirect to the welcome page and store the username in the session
             if role == 'user':
                 session['username'] = username
+                session['user_id'] = result[1]
                 return redirect("/main_page2") # commit this line after completing TODO # 2
             elif role =='manager':
                 session['username'] = username
@@ -206,9 +207,6 @@ def remove_from_cart(job_id):
         cursor.execute("DELETE FROM shopping_car WHERE user_id = %s AND Job_id = %s", (user_id, job_id))
         if cursor.rowcount > 0:
             conn.commit()
-            flash("Job removed from your shopping cart!", "success")
-        else:
-            flash("Job not found in your cart.", "warning")
     except mysql.connector.Error as err:
         flash(f"Error: {err}", "danger")
     finally:
