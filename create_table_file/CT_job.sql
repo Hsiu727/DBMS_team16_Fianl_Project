@@ -22,7 +22,8 @@ create table salary(
     Min_salary DOUBLE,
     Pay_period varchar(10),
     Currency varchar(10),
-    Compensation_type varchar(20)
+    Compensation_type varchar(20),
+    primary key(Salary_id)
 );
 
 LOAD DATA LOCAL INFILE './archive/jobs/benefits.csv'

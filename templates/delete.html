@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('home2') }}">Home</a>
+        <a href="{{ url_for('create') }}">Create</a>
+        <a href="{{ url_for('read') }}">Read</a>
+        <a href="{{ url_for('update') }}">Update</a>
+        <a href="{{ url_for('delete') }}">Delete</a>
+    </nav>
+    <h1>{{ page_title }}</h1>
+
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Industry Name</th>
+                <th>Type of Insurance</th>
+                <th>Skill Abbreviation</th>
+                <th>Skill Name</th>
+                <th>Max Salary</th>
+                <th>Median Salary</th>
+                <th>Min Salary</th>
+                <th>Pay Period</th>
+                <th>Currency</th>
+                <th>Compensation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in data %}
+            <tr>
+                <td>{{ entry.industry_name }}</td>
+                <td>{{ entry.insurance_type }}</td>
+                <td>{{ entry.skill_abbreviation }}</td>
+                <td>{{ entry.skill_name }}</td>
+                <td>{{ entry.max_salary }}</td>
+                <td>{{ entry.median_salary }}</td>
+                <td>{{ entry.min_salary }}</td>
+                <td>{{ entry.pay_period }}</td>
+                <td>{{ entry.currency }}</td>
+                <td>{{ entry.compensation }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

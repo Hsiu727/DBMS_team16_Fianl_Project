@@ -10,7 +10,7 @@ app.secret_key = "your_secret_key"
 db_config = {
     'host': 'localhost',  # Change this to your MySQL host
     'user': 'root',  # Change this to your MySQL username
-    'password': '',  # Change this to your MySQL password
+    'password': '1234',  # Change this to your MySQL password
     'database': 'final_project'  # Change this to your MySQL database name
 }
 
@@ -46,20 +46,16 @@ def login():
             return render_template("login2.html")
         elif result[0] == hashed_password:
             # if pass the check, redirect to the welcome page and store the username in the session
-            session['username'] = username
-            session['user_id'] = result[1]
-            return redirect("/main_page2") # commit this line after completing TODO # 2
+            if role == 'user':
+                session['username'] = username
+                return redirect("/main_page2") # commit this line after completing TODO # 2
+            elif role =='manager':
+                session['username'] = username
+                return redirect("/management_page")
         else:
             flash("Invalid username or password", "error")
             return render_template("login2.html")
     return render_template("login2.html")
-
-# Welcome Page
-@app.route("/welcome")
-def welcome():
-    if 'username' not in session:
-        return redirect("/")
-    return render_template("welcome.html")
 
 # Logout
 @app.route("/logout")
@@ -291,6 +287,77 @@ def company():
         page_range=page_range
     )
 
+# management page 
+@app.route("/management_page")
+def home2():
+    return render_template("management_page.html")
+
+
+
+# create page
+# for management to insert data into a database
+@app.route('/create', methods=['GET', 'POST'])
+def create():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        posting_location = request.form.get('posting_location')
+        company_name = request.form.get('company_name')
+        max_salary = request.form.get('max_salary')
+        min_salary = request.form.get('min_salary')
+
+        # Connect to the database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        #update to query1 
+        i = 1
+        #first check if id was used
+        while True:
+            cursor.execute("SELECT Job_id FROM job_posting WHERE Job_id = %s", (i,))
+            print(cursor.fetchone())
+            if cursor.fetchone() is None:
+                break
+            else:
+                i = i + 1
+        #update to job_posting table
+        cursor.execute("INSERT INTO job_posting (Title, Posting_location, Company_name, Job_id) VALUES (%s, %s, %s, %s)", (title, posting_location, company_name, i))
+        #update to salary table
+        cursor.execute("INSERT INTO salary (Job_id, Max_salary, Min_salary) VALUES (%s, %s, %s)", (i, max_salary, min_salary))
+        #update to query1
+        cursor.execute("INSERT INTO query1 (Title, location, company, Max_salary, Min_salary, Job_id) VALUES (%s, %s, %s, %s, %s, %s)", (title, posting_location, company_name, max_salary, min_salary, i))
+        conn.commit()
+        
+        #update to the original database
+        
+        cursor.close()
+        conn.close()
+        
+        flash("Insert successfully", "success")
+        return redirect("/management_page")  # Redirect to read page to display data
+    
+
+    return render_template('create.html', page_title="Create Page")
+
+@app.route('/read')
+def read():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Fetch all data from the table
+    cursor.execute('SELECT * FROM query1')
+    rows = cursor.fetchall()  # List of tuples containing the data
+
+    conn.close()
+
+    return render_template('read.html', page_title="Read Page", data=rows)
+
+@app.route('/update')
+def update():
+    return render_template('update.html', page_title="Update Page")
+
+@app.route('/delete')
+def delete():
+    return render_template('delete.html', page_title="Delete Page")
 
 
 if __name__ == "__main__":

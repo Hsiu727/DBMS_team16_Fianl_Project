@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        /* 导航栏样式 */
+        nav {
+            background-color: #007BFF;
+            padding: 10px 15px;
+            text-align: center;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* 标题样式 */
+        h1 {
+            text-align: center;
+            color: #007BFF;
+            margin-top: 20px;
+        }
+
+        /* 表单容器 */
+        form {
+            background-color: #fff;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 表单标签和输入框样式 */
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* 提交按钮样式 */
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('home2') }}">Home</a>
+        <a href="{{ url_for('create') }}">Create</a>
+        <a href="{{ url_for('read') }}">Read</a>
+        <a href="{{ url_for('update') }}">Update</a>
+        <a href="{{ url_for('delete') }}">Delete</a>
+    </nav>
+    <h1>{{ page_title }}</h1>
+
+    <!-- 表单 -->
+    <form method="POST">
+        <label for="title">Industry Name:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="posting_location">Type of Insurance:</label>
+        <input type="text" id="posting_location" name="posting_location" required>
+
+        <label for="company_name">Skill Abbreviation:</label>
+        <input type="text" id="company_name" name="company_name" required>
+
+        <label for="max_salary">Max Salary:</label>
+        <input type="number" id="max_salary" name="max_salary" required>
+
+        <label for="min_salary">Min Salary:</label>
+        <input type="number" id="min_salary" name="min_salary" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
