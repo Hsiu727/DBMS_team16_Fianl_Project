@@ -342,7 +342,6 @@ def home2():
     return render_template("management_page.html")
 
 
-
 # create page
 # for management to insert data into a database
 @app.route('/create', methods=['GET', 'POST'])
@@ -492,7 +491,6 @@ def delete():
         for row in data
     ]
     return render_template('delete.html', page_title="Delete Page", data=formatted_data)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
