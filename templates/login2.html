@@ -7,8 +7,11 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background-image: url('https://wallpaperaccess.com/full/1892794.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #0f0f6e;
             margin: 0;
             padding: 0;
         }
@@ -17,14 +20,17 @@
             max-width: 400px;
             margin: 100px auto;
             padding: 20px;
-            background: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent dark background */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            color: #f4f4f9;
+            position: relative;
+            z-index: 2;
         }
 
         h2 {
             text-align: center;
-            color: #4CAF50;
+            color: #ff9800; /* Bright orange for heading */
         }
 
         form {
@@ -36,6 +42,7 @@
         label {
             font-weight: bold;
             margin-bottom: 5px;
+            color: #ff9800;
         }
 
         input[type="text"],
@@ -51,39 +58,41 @@
         input[type="text"]:focus,
         input[type="password"]:focus {
             outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+            border-color: #ff9800;
+            box-shadow: 0 0 5px rgba(255, 152, 0, 0.8);
         }
 
         .login-btn {
-            background-color: #4CAF50;
+            background: linear-gradient(45deg, #ff9800, #ff5722); /* Gradient for vibrancy */
             color: white;
             padding: 10px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s, background-color 0.3s ease;
         }
 
         .login-btn:hover {
-            background-color: #45a049;
+            background: linear-gradient(45deg, #ff5722, #ff9800);
+            transform: scale(1.05);
         }
 
         .manager-btn {
-            background-color: #007acc;
+            background: linear-gradient(45deg, #2196f3, #1e88e5); /* Bright blue gradient */
             color: white;
             padding: 10px;
             font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: transform 0.2s, background-color 0.3s ease;
             margin-top: 10px;
         }
 
         .manager-btn:hover {
-            background-color: #005f99;
+            background: linear-gradient(45deg, #1e88e5, #2196f3);
+            transform: scale(1.05);
         }
 
         .signup-link {
@@ -92,21 +101,22 @@
         }
 
         .signup-link a {
-            color: #4CAF50;
+            color: #ff9800;
             text-decoration: none;
             font-weight: bold;
         }
 
         .signup-link a:hover {
             text-decoration: underline;
+            color: #ff5722;
         }
 
         .flash-messages {
             margin-top: 15px;
             padding: 10px;
-            background-color: #18d645;
+            background-color: #000000;
             color: #a74b15;
-            border: 1px solid #25bc49;
+            border: 1px solid #000000;
             border-radius: 5px;
             align: center;
         }
@@ -129,11 +139,14 @@
             margin-top: 20px;
             text-align: center;
             font-size: 14px;
-            color: #666;
+            color: #f4f4f9;
         }
+
+        
     </style>
 </head>
 <body>
+
     <div class="container">
         <h2>Login</h2>
         <!-- Login Form -->
@@ -173,7 +186,7 @@
     </div>
 
     <footer>
-        &copy; 2024 NYCU DB HW3 112550108 梁家熏. All rights reserved.
+        &copy; 2024 NYCU DBMS Final Project Team 16.
     </footer>
 </body>
 </html>
