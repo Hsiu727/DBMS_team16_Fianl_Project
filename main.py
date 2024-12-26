@@ -167,6 +167,35 @@ def add_to_cart(job_id):
 
     return redirect("/main_page2")
 
+# Remove job from shopping cart
+@app.route("/remove_from_cart/<int:job_id>", methods=["POST"])
+def remove_from_cart(job_id):
+    if 'username' not in session:
+        flash("Please log in to manage your cart.", "error")
+        return redirect("/")
+
+    user_id = session.get('user_id')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Delete the job from the shopping cart
+        cursor.execute("DELETE FROM shopping_car WHERE user_id = %s AND Job_id = %s", (user_id, job_id))
+        if cursor.rowcount > 0:
+            conn.commit()
+            flash("Job removed from your shopping cart!", "success")
+        else:
+            flash("Job not found in your cart.", "warning")
+    except mysql.connector.Error as err:
+        flash(f"Error: {err}", "danger")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect("/view_cart")
+
+
 # View shopping cart
 @app.route("/view_cart")
 def view_cart():
