@@ -4,4 +4,5 @@ Database Link: [LinkedIn Job Postings (2023 - 2024)](https://www.kaggle.com/data
 
 Hackmd Link: https://hackmd.io/ofgffCfjSGmoJdjHQp6QVw?both
 
-Demo Video: https://youtu.be/KJw4j9uItQ0 
+Presentation Video：https://youtu.be/q7AY_wCrAsY
+Demo Video：https://youtu.be/KJw4j9uItQ0 
