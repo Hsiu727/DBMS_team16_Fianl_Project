@@ -10,7 +10,7 @@ app.secret_key = "your_secret_key"
 db_config = {
     'host': 'localhost',  # Change this to your MySQL host
     'user': 'root',  # Change this to your MySQL username
-    'password': '1234',  # Change this to your MySQL password
+    'password': '',  # Change this to your MySQL password
     'database': 'final_project'  # Change this to your MySQL database name
 }
 
@@ -43,20 +43,20 @@ def login():
 
         if result==None:
             flash("Invalid username or password", "error")
-            return render_template("login2.html")
+            return render_template("login.html")
         elif result[0] == hashed_password:
             # if pass the check, redirect to the welcome page and store the username in the session
             if role == 'user':
                 session['username'] = username
                 session['user_id'] = result[1]
-                return redirect("/main_page2") # commit this line after completing TODO # 2
+                return redirect("/user") # commit this line after completing TODO # 2
             elif role =='manager':
                 session['username'] = username
-                return redirect("/management_page")
+                return redirect("/management")
         else:
             flash("Invalid username or password", "error")
-            return render_template("login2.html")
-    return render_template("login2.html")
+            return render_template("login.html")
+    return render_template("login.html")
 
 # Logout
 @app.route("/logout")
@@ -98,7 +98,7 @@ def signup():
     
     return render_template("signup.html")
 
-@app.route("/main_page2")
+@app.route("/user")
 def home():
     search_query = request.args.get('search_query')  # Get the search query from the URL
     page = request.args.get("page", 1, type=int)  # Get the current page number from the URL (default is 1)
@@ -152,7 +152,7 @@ def home():
     page_range = range(start_page, end_page + 1)
 
     return render_template(
-        "main_page2.html",
+        "user.html",
         jobs=job_listings,
         page=page,
         total_pages=total_pages,
@@ -187,7 +187,7 @@ def add_to_cart(job_id):
         cursor.close()
         conn.close()
 
-    return redirect("/main_page2")
+    return redirect("/user")
 
 
 # Remove job from shopping cart
@@ -326,7 +326,7 @@ def company():
     ]
 
     return render_template(
-        "company_page.html",
+        "company.html",
         jobs=company_list,
         page=page,
         total_pages=total_pages,
@@ -336,9 +336,9 @@ def company():
 
 
 # management page 
-@app.route("/management_page")
+@app.route("/management")
 def home2():
-    return render_template("management_page.html")
+    return render_template("management.html")
 
 
 # create page
@@ -387,7 +387,7 @@ def create():
         conn.close()
         
         flash("Insert successfully", "success")
-        return redirect("/management_page")  # Redirect to read page to display data
+        return redirect("/management")  # Redirect to read page to display data
     
 
     return render_template('create.html', page_title="Create Page")
