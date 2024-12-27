@@ -512,6 +512,48 @@ def delete():
     ]
     return render_template('delete.html', page_title="Delete Page", data=formatted_data)
 
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "POST":
+        username=session['username']
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        #username = request.form['username']
+        #new_password = request.form['new_password']
+        #confirm_password = request.form['confirm_password']
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT password,id FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+
+        current_hash = hashlib.sha256(current_password.encode()).hexdigest()
+        if result[0] != current_hash:
+            flash("current password is wrong", "error")
+            return redirect("/reset_password")
+        
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return redirect("/reset_password")
+
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+
+        try:
+            cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashed_password, username))
+            conn.commit()
+            flash("Password reset successfully.", "success")
+            return redirect("/")
+        except mysql.connector.Error as err:
+            flash(f"Error: {err}", "danger")
+        finally:
+            cursor.close()
+            conn.close()
+
+    return render_template("reset_password.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
