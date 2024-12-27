@@ -234,6 +234,7 @@ def view_cart():
     FROM shopping_car sc
     JOIN query1 j ON sc.Job_id = j.Job_id
     WHERE sc.user_id = %s
+    Group by j.Job_id, j.Title, j.company, j.location, j.Min_salary, j.Max_salary , j.Skill_name , j.Currency
     """, (user_id,))
     
     cart_items = cursor.fetchall()
