@@ -39,6 +39,27 @@
             margin-top: 20px;
         }
 
+        /* Flash 消息样式 */
+        .flash-message {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         /* 表单容器 */
         form {
             background-color: #fff;
@@ -89,8 +110,20 @@
         <a href="{{ url_for('read') }}">Read</a>
         <a href="{{ url_for('update') }}">Update</a>
         <a href="{{ url_for('delete') }}">Delete</a>
+        <a href="{{ url_for('logout') }}">Log out</a>
     </nav>
     <h1>{{ page_title }}</h1>
+
+    <!-- Flash 消息 -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-message">
+            {% for category, message in messages %}
+            <div class="flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
 
     <!-- 第一步：輸入查詢條件 -->
     <form method="GET">
@@ -107,10 +140,11 @@
         <label for="field">Select Field to Update:</label>
         <select id="field" name="field" required>
             <option value="title">Title</option>
-            <option value="posting_location">Location</option>
-            <option value="company_name">Company Name</option>
-            <option value="max_salary">Max Salary</option>
-            <option value="min_salary">Min Salary</option>
+            <option value="location">Location</option>
+            <option value="Company">Company Name</option>
+            <option value="Max_salary">Max Salary</option>
+            <option value="Min_salary">Min Salary</option>
+            <option value="skill_name">Skill Name</option> <!-- 新增技能名稱選項 -->
         </select>
 
         <label for="new_value">Enter New Value:</label>

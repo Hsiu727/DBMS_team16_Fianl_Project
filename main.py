@@ -10,7 +10,7 @@ app.secret_key = "your_secret_key"
 db_config = {
     'host': 'localhost',  # Change this to your MySQL host
     'user': 'root',  # Change this to your MySQL username
-    'password': '',  # Change this to your MySQL password
+    'password': '1234',  # Change this to your MySQL password
     'database': 'final_project'  # Change this to your MySQL database name
 }
 
@@ -256,7 +256,7 @@ def view_cart():
 
     return render_template("cart.html", cart_items=job_listings_in_cart)
 
-@app.route("/company")
+
 @app.route("/company")
 def company():
     # Get the current page number from the query string (default is 1)
@@ -351,6 +351,7 @@ def create():
         company_name = request.form.get('company_name')
         max_salary = request.form.get('max_salary')
         min_salary = request.form.get('min_salary')
+        skill_name = request.form.get('skill_name')
 
         # Connect to the database
         conn = get_db_connection()
@@ -358,11 +359,18 @@ def create():
         
         #update to query1 
         i = 0
+        j = 0
         #first check if id was used
         while True:
-            cursor.execute("SELECT Job_id FROM job_posting WHERE Job_id = %s", (str(i),))
+            cursor.execute("SELECT Job_id FROM job_posting WHERE Job_id = %s", (str(i),)) #O(n)
             #print(cursor.fetchone())
             if cursor.fetchone() is None:
+                while True: 
+                    cursor.execute("SELECT Salary_id FROM salary WHERE Salary_id = %s", (str(j),))
+                    if cursor.fetchone() is None:
+                        break
+                    else:
+                        j = j + 1
                 break
             else:
                 i = i + 1
@@ -370,10 +378,9 @@ def create():
         #update to salary table
         #update to query1
         cursor.execute("INSERT INTO job_posting (Title, Posting_location, Company_name, Job_id) VALUES (%s, %s, %s, %s)", (title, posting_location, company_name, str(i)))
-        cursor.execute("INSERT INTO salary (Job_id, Max_salary, Min_salary) VALUES (%s, %s, %s)", (str(i), max_salary, min_salary))
-        cursor.execute("INSERT INTO query1 (Title, location, company, Max_salary, Min_salary, Job_id) VALUES (%s, %s, %s, %s, %s, %s)", (title, posting_location, company_name, max_salary, min_salary, str(i)))
+        cursor.execute("INSERT INTO salary (Salary_id, Job_id, Max_salary, Min_salary) VALUES (%s, %s, %s, %s)", (str(j), str(i), max_salary, min_salary))
+        cursor.execute("INSERT INTO query1 (Title, location, company, Max_salary, Min_salary, Job_id, Skill_name, Currency) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (title, posting_location, company_name, max_salary, min_salary, str(i), skill_name, "USD"))
         conn.commit()
-        
         #update to the original database
         
         cursor.close()
@@ -395,20 +402,20 @@ def read():
     search_query = request.args.get('search')  # 修正為與 HTML 輸入欄一致
     if search_query:
         query = '''
-            SELECT Title, location, company, Max_salary, Min_salary 
+            SELECT Title, location, company, Max_salary, Min_salary, Skill_name
             FROM query1 
-            WHERE Title LIKE %s OR company LIKE %s OR Max_salary LIKE %s OR Min_salary LIKE %s
+            WHERE Title LIKE %s OR company LIKE %s OR Max_salary LIKE %s OR Min_salary LIKE %s OR Skill_name LIKE %s
             LIMIT 5
         '''
-        cursor.execute(query, (f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', f'%{search_query}%'))
+        cursor.execute(query, (f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', f'%{search_query}%', f'%{search_query}%'))
         results = cursor.fetchall()
     else:
-        cursor.execute('SELECT Title, location, company, Max_salary, Min_salary FROM query1 ORDER BY Job_id LIMIT 5')
+        cursor.execute('SELECT Title, location, company, Max_salary, Min_salary, Skill_name FROM query1 ORDER BY Job_id LIMIT 5')
         results = cursor.fetchall()
 
         
     # 最近 5 条记录逻辑
-    cursor.execute('SELECT Title, location, company, Max_salary, Min_salary FROM query1 ORDER BY Job_id LIMIT 5')
+    cursor.execute('SELECT Title, location, company, Max_salary, Min_salary, Skill_name FROM query1 ORDER BY Job_id LIMIT 5')
     latest_data = cursor.fetchall()
 
     conn.close()
@@ -420,29 +427,43 @@ def read():
 def update():
     conn = get_db_connection()
     cursor = conn.cursor()
-
-    if request.method == 'POST':
-        # 更新數據
-        field = request.form['field']
-        new_value = request.form['new_value']
-        search = request.args.get('search')
-
-        query = f"UPDATE query1 SET {field} = %s WHERE Title = %s OR Job_id = %s"
-        cursor.execute(query, (new_value, search, search))
-        conn.commit()
-        flash(f"Successfully updated {field} to {new_value}.", "success")
-
-    elif request.method == 'GET':
-        # 查詢數據
-        search = request.args.get('search')
-        if search:
-            cursor.execute("SELECT * FROM query1 WHERE Title = %s OR Job_id = %s", (search, search))
+    
+    # 查詢資料
+    if request.method == 'GET':
+        search_query = request.args.get('search')
+        if search_query:
+            cursor.execute("""
+                SELECT Title, location, company, Max_salary, Min_salary, Skill_name 
+                FROM query1 
+                WHERE Title LIKE %s OR Job_id = %s
+            """, (f"%{search_query}%", search_query))
             data = cursor.fetchone()
+            if not data:
+                flash("No record found for the given Title or ID.", "error")
         else:
             data = None
+        conn.close()
+        return render_template('update.html', page_title="Update Page", data=data)
 
-    conn.close()
-    return render_template('update.html', page_title="Update Page", data=data)
+    # 更新資料
+    if request.method == 'POST':
+        field = request.form.get('field')
+        new_value = request.form.get('new_value')
+        search_query = request.args.get('search')
+
+        try:
+            if field == 'skill_name':
+                cursor.execute("UPDATE query1 SET Skill_name = %s WHERE Job_id = %s", (new_value, search_query))
+            else:
+                cursor.execute(f"UPDATE query1 SET {field} = %s WHERE Title = %s OR Job_id = %s", (new_value, search_query, search_query))
+            conn.commit()
+            flash(f"{field} has been successfully updated to {new_value}.", "success")
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", "error")
+        finally:
+            cursor.close()
+            conn.close()
+        return redirect('/update')
 
 
 @app.route('/delete', methods=['GET', 'POST'])
